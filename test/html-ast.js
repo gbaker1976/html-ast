@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-let htmlAst = require('../src/html-ast');
+let htmlAst = require('../src/index');
 let assert = require( 'assert' );
 
 describe( 'HTML AST Parser', () => {
