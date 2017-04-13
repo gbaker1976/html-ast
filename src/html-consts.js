@@ -1,0 +1,26 @@
+export const CONTEXT_OPEN_TAG = 1;
+export const CONTEXT_CLOSE_TAG = 2;
+export const CONTEXT_OPEN_ELEMENT = 4;
+export const CONTEXT_CLOSE_ELEMENT = 8;
+export const CONTEXT_OPEN_COMMENT = 16;
+export const CONTEXT_CLOSE_COMMENT = 32;
+export const CONTEXT_OPEN_TEXT = 64;
+export const CONTEXT_CLOSE_TEXT = 128;
+export const CONTEXT_OPEN_PARAM_NAME = 256;
+export const CONTEXT_CLOSE_PARAM_NAME = 512;
+export const CONTEXT_PARAM_NAME_DELIMIT = 1024;
+export const CONTEXT_OPEN_PARAM_VALUE = 2048;
+export const CONTEXT_CLOSE_PARAM_VALUE = 4096;
+export const CONTEXT_OPEN_DECL = 8192;
+export const CONTEXT_CLOSE_DECL = 16384;
+export const CONTEXT_OPEN_DECL_NAME = 32768;
+export const CONTEXT_OPEN_TAG_NAME = 65536;
+export const CONTEXT_CLOSE_TAG_NAME = 131072;
+export const CONTEXT_CLOSE_OPEN_TAG = 262144;
+
+export const NODETYPE_ELEMENT = 1;
+export const NODETYPE_COMMENT = 2;
+export const NODETYPE_TEXT = 4;
+export const NODETYPE_PARAM = 8;
+export const NODETYPE_PARAM_VALUE = 16;
+export const NODETYPE_DECL = 32;
