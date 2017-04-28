@@ -20,6 +20,7 @@ const parser = ( str ) => {
 	let buf = [];
 	let context = null;
 	let ast = {
+		lineCount: 1,
 		current: null,
 		parents: [],
 		doc: []
@@ -32,6 +33,7 @@ const parser = ( str ) => {
 	if ( !str ) {
 		delete ast.current;
 		delete ast.parents;
+		delete ast.lineCount;
 		return ast;
 	}
 
@@ -64,6 +66,10 @@ const parser = ( str ) => {
 				}
 			}
 		} else {
+			if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
+				throw new Error( 'Undelimited parameter value or missing parameter value on line: ' + ast.lineCount );
+			}
+
 			if ( context & ( constants.CONTEXT_OPEN_TEXT |
 							 constants.CONTEXT_OPEN_COMMENT |
 							 constants.CONTEXT_OPEN_PARAM_VALUE |
@@ -112,6 +118,7 @@ const parser = ( str ) => {
 
 	delete ast.current;
 	delete ast.parents;
+	delete ast.lineCount;
 
 	return ast;
 };

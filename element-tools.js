@@ -52,6 +52,12 @@ const addParameter = (ast, name, value) => {
 	}
 };
 
+const lineCount = (chr, ast) => {
+	if (/[\n\r]/.test(chr)) {
+		ast.lineCount++;
+	}
+};
+
 module.exports = {
 	createNodeOfType: createNodeOfType,
 	addChildNode: addChildNode,
@@ -81,6 +87,12 @@ module.exports = {
 
 	whitespaceDelimiter: (str, idx, ast, buf, context) => {
 		let chr = str[idx];
+
+		lineCount(chr, ast);
+
+		if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
+			throw new Error( 'Undelimited parameter value or missing parameter value on line: ' + ast.lineCount );
+		}
 
 		if ( context & ( constants.CONTEXT_OPEN_COMMENT |
 						 constants.CONTEXT_OPEN_TEXT |
