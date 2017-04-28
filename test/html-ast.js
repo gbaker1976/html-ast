@@ -11,13 +11,13 @@ describe( 'HTML AST Parser', () => {
 					type: 32,
 					name: '',
 					value: '',
-										parameters: [],
+					parameters: [],
 					children: [
 						{
 							type: 2, // comment
 							value: 'foobar',
 							name: '',
-														parameters: [],
+							parameters: [],
 							children: []
 						}
 					]

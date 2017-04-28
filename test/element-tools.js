@@ -1,6 +1,6 @@
 import 'babel-polyfill';
-import * as elementTools from '../element-tools';
-import * as constants from '../html-consts';
+const elementTools = require( '../element-tools' );
+const constants = require( '../html-consts' );
 
 let assert = require( 'assert' );
 
