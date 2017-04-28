@@ -96,8 +96,15 @@ module.exports = {
 			}
 
 			if ( context & constants.CONTEXT_OPEN_TAG_NAME ) {
-				return constants.CONTEXT_CLOSE_TAG_NAME;
+				context = constants.CONTEXT_CLOSE_TAG_NAME;
+
+				if ( 'script' === ast.current.name ) {
+					context |= constants.CONTEXT_SCRIPT_TAG;
+				}
+
+				return context;
 			}
+
 			return constants.CONTEXT_OPEN_DECL;
 		}
 
@@ -171,6 +178,9 @@ module.exports = {
 
 			return constants.CONTEXT_CLOSE_ELEMENT;
 		} else if ( context & ( constants.CONTEXT_OPEN_TAG ) ) {
+
+			context &= ~constants.CONTEXT_SCRIPT_TAG;
+
 			return constants.CONTEXT_CLOSE_TAG;
 		}
 
@@ -185,7 +195,13 @@ module.exports = {
 			ast.current.name = buf.join('');
 
 			if ( context & constants.CONTEXT_OPEN_TAG_NAME ) {
-				return constants.CONTEXT_CLOSE_OPEN_TAG;
+				context = constants.CONTEXT_CLOSE_OPEN_TAG;
+
+				if ( 'script' === ast.current.name ) {
+					context |= constants.CONTEXT_SCRIPT_TAG;
+				}
+
+				return context;
 			}
 
 			if ( context & ( constants.CONTEXT_OPEN_DECL |
@@ -200,7 +216,13 @@ module.exports = {
 								constants.CONTEXT_CLOSE_PARAM_VALUE |
 								constants.CONTEXT_CLOSE_PARAM_NAME ) ) {
 
-			return constants.CONTEXT_CLOSE_OPEN_TAG;
+			context = constants.CONTEXT_CLOSE_OPEN_TAG;
+
+			if ( 'script' === ast.current.name ) {
+				context |= constants.CONTEXT_SCRIPT_TAG;
+			}
+
+			return context;
 		} else if ( context & constants.CONTEXT_CLOSE_TAG ) {
 			return constants.CONTEXT_CLOSE_ELEMENT;
 		} else if ( context & constants.CONTEXT_CLOSE_COMMENT ) {
@@ -211,8 +233,8 @@ module.exports = {
 	},
 
 	leftAngleDelimiter: (str, idx, ast, buf, context) => {
-		const endTag = ( '/' === str[idx+1] );
-		const openDecl = ( '!' === str[idx+1] );
+		const endTag = ( '/' === str[idx+1] && (context & ~constants.CONTEXT_SCRIPT_TAG) );
+		const openDecl = ( '!' === str[idx+1] && (context & ~constants.CONTEXT_SCRIPT_TAG) );
 
 		if ( null === context || (context & (constants.CONTEXT_CLOSE_OPEN_TAG |
 											 constants.CONTEXT_CLOSE_DECL |
@@ -234,6 +256,8 @@ module.exports = {
 				ast.current.value = buf.join('');
 				addChildNode( ast, constants.NODETYPE_DECL );
 				return constants.CONTEXT_OPEN_ELEMENT;
+			} else if ( context & constants.CONTEXT_SCRIPT_TAG ) {
+				buf.push(str[idx]);
 			} else {
 				ast.current.value = buf.join('');
 				addChildNode( ast, constants.NODETYPE_ELEMENT );

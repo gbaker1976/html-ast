@@ -374,6 +374,90 @@ describe( 'HTML AST Parser', () => {
 		done();
       });
 
+	  it( 'should parse script tag into AST', ( done ) => {
+		let expected = {
+			doc: [
+				{
+					type: 1,
+					name: 'script',
+					value: '',
+					parameters: [],
+					children: [
+						{
+							type: 4,
+							name: '',
+							children: [],
+							parameters: [],
+							value: 'foobar'
+						}
+					]
+				}
+			]
+		};
+		let html = "<script>foobar</script>";
+		let actual = htmlAst( html );
+
+		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
+		done();
+      });
+
+	  it( 'should parse script tag with type parameter into AST', ( done ) => {
+		let expected = {
+			doc: [
+				{
+					type: 1,
+					name: 'script',
+					value: '',
+					parameters: [{
+						name: 'type',
+						value: 'application/javascript'
+					}],
+					children: [
+						{
+							type: 4,
+							name: '',
+							children: [],
+							parameters: [],
+							value: 'foobar'
+						}
+					]
+				}
+			]
+		};
+		let html = "<script type='application/javascript'>foobar</script>";
+		let actual = htmlAst( html );
+
+		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
+		done();
+      });
+
+	  it( 'should parse script tag with embedded delimiters into AST', ( done ) => {
+		let expected = {
+			doc: [
+				{
+					type: 1,
+					name: 'script',
+					value: '',
+					parameters: [],
+					children: [
+						{
+							type: 4,
+							name: '',
+							children: [],
+							parameters: [],
+							value: "var foo = 'bar'; if (foo < 1) {alert('foo')}"
+						}
+					]
+				}
+			]
+		};
+		let html = "<script>var foo = 'bar'; if (foo < 1) {alert('foo')}</script>";
+		let actual = htmlAst( html );
+
+		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
+		done();
+      });
+
 	  it( 'should parse whitespace into text node into AST', ( done ) => {
 		let expected = {
 			doc: [

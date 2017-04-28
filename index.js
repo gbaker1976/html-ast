@@ -11,10 +11,10 @@ if (require.main === module) {
 		html.push(chunk);
 	});
 	process.stdin.on( 'end', () => {
-		process.stdout.write( JSON.stringify(parser(html.toString('utf-8'), 0)) );
+		process.stdout.write( JSON.stringify(parser(html.toString('utf-8'))) );
 	});
 } else {
 	module.exports = (html) => {
-		return parser(html, 0);
+		return parser(html);
 	};
 }
