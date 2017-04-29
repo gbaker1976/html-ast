@@ -1070,7 +1070,7 @@ describe( 'HTML AST Parser', () => {
 
 	  it( 'should flag parameter value missing start delimiter', ( done ) => {
 		let html = "<h1 foo=bar>foobar</h1>";
-		assert.throws( () => { htmlAst( html ) }, Error, 'Result of parse does not match!' );
+		assert.throws( () => { htmlAst( html ) }, /Undelimited parameter value or missing parameter value on line: 1/, 'Result of parse does not match!' );
 		done();
       });
 

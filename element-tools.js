@@ -205,10 +205,6 @@ module.exports = {
 			throw new Error( 'Missing closing parameter value delimiter on line: ' + ast.lineCount );
 		}
 
-		if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
-			throw new Error( 'Missing closing parameter value delimiter on line: ' + ast.lineCount );
-		}
-
 		if ( context & ( constants.CONTEXT_OPEN_DECL |
 						 constants.CONTEXT_OPEN_DECL_NAME |
 						 constants.CONTEXT_OPEN_TAG_NAME ) ) {
