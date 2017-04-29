@@ -3,7 +3,7 @@ let htmlAst = require('../index');
 let assert = require( 'assert' );
 
 describe( 'HTML AST Parser', () => {
-	describe( '#parser', () => {
+	describe( '#comments', () => {
       it( 'should parse simple comment into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -123,7 +123,7 @@ describe( 'HTML AST Parser', () => {
 		done();
       });
 
-	  it( 'should parse multiple comments into AST', ( done ) => {
+	  it( 'should parse comment with embedded comment delimiters into AST', ( done ) => {
 		let expected = {
 			doc: [
 				{
@@ -156,7 +156,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	describe( '#doctype', () => {
 	  it( 'should parse DOCTYPE into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -197,7 +199,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	describe( '#tags', () => {
 	  it( 'should parse tag into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -224,7 +228,51 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	it( 'should parse tags and comment siblings into AST', ( done ) => {
+	  let expected = {
+		  doc: [
+			  {
+				  type: 1,
+				  name: 'h1',
+				  value: '',
+				  parameters: [],
+				  children: [
+					  {
+						  type: 4,
+						  name: '',
+						  children: [],
+						  parameters: [],
+						  value: 'foobar'
+					  }
+				  ]
+			  },
+			  {
+				  type: 32,
+				  name: '',
+				  value: '',
+				  parameters: [],
+				  children: [
+					  {
+						  type: 2, // comment
+						  value: 'baz',
+						  name: '',
+						  parameters: [],
+						  children: []
+					  }
+				  ]
+			  }
+		  ]
+	  };
+	  let html = "<h1>foobar</h1><!--baz-->";
+	  let actual = htmlAst( html );
+
+	  assert.deepEqual( actual, expected, 'Result of parse does not match!' );
+	  done();
+	});
+
+	describe( '#children', () => {
 	  it( 'should parse mixed children into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -273,7 +321,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	describe( '#parameters', () => {
 	  it( 'should parse tag parameter into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -373,7 +423,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	describe( '#script tags', () => {
 	  it( 'should parse script tag into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -457,7 +509,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	describe( '#whitespace', () => {
 	  it( 'should parse whitespace into text node into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -520,49 +574,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
-	  it( 'should parse tags into AST', ( done ) => {
-		let expected = {
-			doc: [
-				{
-					type: 1,
-					name: 'h1',
-					value: '',
-					parameters: [],
-					children: [
-						{
-							type: 4,
-							name: '',
-							children: [],
-							parameters: [],
-							value: 'foobar'
-						}
-					]
-				},
-				{
-					type: 32,
-					name: '',
-					value: '',
-					parameters: [],
-					children: [
-						{
-							type: 2, // comment
-							value: 'baz',
-							name: '',
-							parameters: [],
-							children: []
-						}
-					]
-				}
-			]
-		};
-		let html = "<h1>foobar</h1><!--baz-->";
-		let actual = htmlAst( html );
-
-		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
-		done();
-      });
-
+	describe( '#child heirarchy', () => {
 	  it( 'should parse heirarchical tags into AST', ( done ) => {
 		let expected = {
 			doc: [
@@ -994,8 +1008,10 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
-	  it( 'should parse tag context into AST', ( done ) => {
+	describe( '#element context', () => {
+	  it( 'should parse element context into AST', ( done ) => {
 		let expected = {
 			doc: [
 				{
@@ -1025,7 +1041,7 @@ describe( 'HTML AST Parser', () => {
 		done();
       });
 
-	  it( 'should parse child tag context into AST', ( done ) => {
+	  it( 'should parse child element context into AST', ( done ) => {
 		let expected = {
 			doc: [
 				{
@@ -1067,7 +1083,9 @@ describe( 'HTML AST Parser', () => {
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
       });
+  	});
 
+	describe( '#validation errors', () => {
 	  it( 'should flag parameter value missing start delimiter', ( done ) => {
 		let html = "<h1 foo=bar>foobar</h1>";
 		assert.throws( () => { htmlAst( html ) }, /Undelimited parameter value or missing parameter value on line: 1/, 'Result of parse does not match!' );
