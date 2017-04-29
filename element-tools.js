@@ -52,7 +52,7 @@ const addParameter = (ast, name, value) => {
 	}
 };
 
-const lineCount = (chr, ast) => {
+const countLine = (chr, ast) => {
 	if (/[\n\r]/.test(chr)) {
 		ast.lineCount++;
 	}
@@ -88,7 +88,7 @@ module.exports = {
 	whitespaceDelimiter: (str, idx, ast, buf, context) => {
 		let chr = str[idx];
 
-		lineCount(chr, ast);
+		countLine(chr, ast);
 
 		if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
 			throw new Error( 'Undelimited parameter value or missing parameter value on line: ' + ast.lineCount );
@@ -200,6 +200,15 @@ module.exports = {
 	},
 
 	rightAngleDelimiter: (str, idx, ast, buf, context) => {
+
+		if ( context & constants.CONTEXT_OPEN_PARAM_VALUE ) {
+			throw new Error( 'Missing closing parameter value delimiter on line: ' + ast.lineCount );
+		}
+
+		if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
+			throw new Error( 'Missing closing parameter value delimiter on line: ' + ast.lineCount );
+		}
+
 		if ( context & ( constants.CONTEXT_OPEN_DECL |
 						 constants.CONTEXT_OPEN_DECL_NAME |
 						 constants.CONTEXT_OPEN_TAG_NAME ) ) {
@@ -226,7 +235,7 @@ module.exports = {
 			buf.push(str[idx]);
 		} else if ( context & ( constants.CONTEXT_OPEN_TAG |
 								constants.CONTEXT_CLOSE_PARAM_VALUE |
-								constants.CONTEXT_CLOSE_PARAM_NAME ) ) {
+								constants.CONTEXT_OPEN_PARAM_NAME ) ) {
 
 			context = constants.CONTEXT_CLOSE_OPEN_TAG;
 
