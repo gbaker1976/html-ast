@@ -1095,7 +1095,7 @@ describe( 'HTML AST Parser', () => {
 	  it( 'should flag parameter value missing end delimiter on line three', ( done ) => {
 		let html = "<h1 \n\nfoo=bar>foobar</h1>";
 
-		assert.deepEqual( () => { htmlAst( html ) }, /Missing closing parameter value delimiter on line: 3/, 'Result of parse does not match!' );
+		assert.throws( () => { htmlAst( html ) }, /Undelimited parameter value or missing parameter value on line: 3/, 'Result of parse does not match!' );
 		done();
       });
 
