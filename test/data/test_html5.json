@@ -1,0 +1,321 @@
+{
+	"doc": [{
+		"type": 32,
+		"name": "doctype",
+		"value": "html",
+		"parameters": [],
+		"children": []
+	}, {
+		"type": 1,
+		"name": "html",
+		"value": "",
+		"parameters": [{
+			"name": "class",
+			"value": "nojs"
+		}, {
+			"name": "lang",
+			"value": ""
+		}],
+		"children": [{
+			"type": 1,
+			"name": "head",
+			"value": "",
+			"parameters": [],
+			"children": [{
+				"type": 1,
+				"name": "meta",
+				"value": "",
+				"parameters": [{
+					"name": "charset",
+					"value": "utf8"
+				}],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "title",
+				"value": "",
+				"parameters": [],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "meta",
+				"value": "",
+				"parameters": [{
+					"name": "name",
+					"value": "description"
+				}, {
+					"name": "content",
+					"value": ""
+				}],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "meta",
+				"value": "",
+				"parameters": [{
+					"name": "name",
+					"value": "viewport"
+				}, {
+					"name": "content",
+					"value": "width=devicewidth, initialscale=1"
+				}],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "link",
+				"value": "",
+				"parameters": [{
+					"name": "rel",
+					"value": "appletouchicon"
+				}, {
+					"name": "href",
+					"value": "icon.png"
+				}],
+				"children": []
+			}, {
+				"type": 32,
+				"name": "",
+				"value": "",
+				"parameters": [],
+				"children": [{
+					"type": 2,
+					"name": "",
+					"value": " Place favicon.ico in the root directory ",
+					"parameters": [],
+					"children": []
+				}]
+			}, {
+				"type": 1,
+				"name": "link",
+				"value": "",
+				"parameters": [{
+					"name": "rel",
+					"value": "manifest"
+				}, {
+					"name": "href",
+					"value": "site.webmanifest"
+				}],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "meta",
+				"value": "",
+				"parameters": [{
+					"name": "name",
+					"value": "themecolor"
+				}, {
+					"name": "content",
+					"value": "#fafafa"
+				}],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "link",
+				"value": "",
+				"parameters": [{
+					"name": "rel",
+					"value": "stylesheet"
+				}, {
+					"name": "href",
+					"value": "css/main.css"
+				}],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "link",
+				"value": "",
+				"parameters": [{
+					"name": "rel",
+					"value": "stylesheet"
+				}, {
+					"name": "href",
+					"value": "css/normalize.css"
+				}],
+				"children": []
+			}]
+		}]
+	}, {
+		"type": 1,
+		"name": "body",
+		"value": "",
+		"parameters": [],
+		"children": [{
+			"type": 32,
+			"name": "",
+			"value": "",
+			"parameters": [],
+			"children": [{
+				"type": 2,
+				"name": "p",
+				"value": "",
+				"parameters": [{
+					"name": "class",
+					"value": "browserupgrade"
+				}],
+				"children": []
+			}, {
+				"type": 4,
+				"name": "",
+				"value": "You are using an ",
+				"parameters": [],
+				"children": []
+			}, {
+				"type": 1,
+				"name": "strong",
+				"value": "",
+				"parameters": [],
+				"children": [{
+					"type": 4,
+					"name": "",
+					"value": "outdated",
+					"parameters": [],
+					"children": []
+				}]
+			}]
+		}, {
+			"type": 4,
+			"name": "",
+			"value": "browser. Please ",
+			"parameters": [],
+			"children": []
+		}, {
+			"type": 1,
+			"name": "a",
+			"value": "",
+			"parameters": [{
+				"name": "href",
+				"value": "https://browsehappy.com/"
+			}],
+			"children": [{
+				"type": 4,
+				"name": "",
+				"value": "upgrade your browser",
+				"parameters": [],
+				"children": []
+			}]
+		}]
+	}, {
+		"type": 4,
+		"name": "",
+		"value": "to improve your experience and security.",
+		"parameters": [],
+		"children": []
+	}, {
+		"type": 32,
+		"name": "[endif]",
+		"value": "",
+		"parameters": [],
+		"children": []
+	}, {
+		"type": 32,
+		"name": "",
+		"value": "",
+		"parameters": [],
+		"children": [{
+			"type": 2,
+			"name": "",
+			"value": " Add your site or application content here ",
+			"parameters": [],
+			"children": []
+		}]
+	}, {
+		"type": 1,
+		"name": "p",
+		"value": "",
+		"parameters": [],
+		"children": [{
+			"type": 4,
+			"name": "",
+			"value": "Hello world! This is HTML5 Boilerplate.",
+			"parameters": [],
+			"children": []
+		}]
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [{
+			"name": "src",
+			"value": "js/vendor/modernizr{{MODERNIZR_VERSION}}.min.js"
+		}],
+		"children": []
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [{
+			"name": "src",
+			"value": "https://code.jquery.com/jquery{{JQUERY_VERSION}}.min.js"
+		}, {
+			"name": "integrity",
+			"value": "{{JQUERY_SRI_HASH}}"
+		}, {
+			"name": "crossorigin",
+			"value": "anonymous"
+		}],
+		"children": []
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [],
+		"children": [{
+			"type": 4,
+			"name": "",
+			"value": "window.jQuery || document.write('<script src=\"js/vendor/jquery{{JQUERY_VERSION}}.min.js\"<\\/script')",
+			"parameters": [],
+			"children": []
+		}]
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [{
+			"name": "src",
+			"value": "js/plugins.js"
+		}],
+		"children": []
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [{
+			"name": "src",
+			"value": "js/main.js"
+		}],
+		"children": []
+	}, {
+		"type": 32,
+		"name": "",
+		"value": "",
+		"parameters": [],
+		"children": [{
+			"type": 2,
+			"name": "",
+			"value": " Google Analytics: change UAXXXXXY to be your site's ID. ",
+			"parameters": [],
+			"children": []
+		}]
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [],
+		"children": [{
+			"type": 4,
+			"name": "",
+			"value": "window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;\n    ga('create', 'UAXXXXXY', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')\n  ",
+			"parameters": [],
+			"children": []
+		}]
+	}, {
+		"type": 1,
+		"name": "script",
+		"value": "",
+		"parameters": [{
+			"name": "src",
+			"value": "https://www.googleanalytics.com/analytics.js"
+		}],
+		"children": []
+	}]
+}

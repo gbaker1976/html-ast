@@ -1,8 +1,17 @@
-import 'babel-polyfill';
-let htmlAst = require('../index');
-let assert = require( 'assert' );
+import {parser as htmlAst} from '../html-ast';
+import html5Json from './data/test_html5.json';
+import assert from 'assert';
+import fs from 'fs';
+
+const html5 = fs.readFileSync(__dirname + '/data/test_html5.html', {encoding: 'utf-8'});
 
 describe( 'HTML AST Parser', () => {
+	describe( '#html5 parse', () => {
+		it( 'should parse HTML5 template into AST', () => {
+			assert.deepEqual( htmlAst(html5), html5Json, 'Result of parse does not match!' );
+		});
+	});
+
 	describe( '#comments', () => {
       it( 'should parse simple comment into AST', ( done ) => {
 		let expected = {
@@ -227,6 +236,42 @@ describe( 'HTML AST Parser', () => {
 
 		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 		done();
+      });
+
+	  it( 'should parse empty tag into AST', () => {
+		let expected = {
+			doc: [
+				{
+					type: 1,
+					name: 'meta',
+					value: '',
+					parameters: [{
+						name: 'lang',
+						value: 'foo'
+					}],
+					children: []
+				},
+				{
+					type: 1,
+					name: 'h1',
+					value: '',
+					parameters: [],
+					children: [
+						{
+							type: 4,
+							name: '',
+							children: [],
+							parameters: [],
+							value: 'foobar'
+						}
+					]
+				}
+			]
+		};
+		let html = "<meta lang='foo'><h1>foobar</h1>";
+		let actual = htmlAst( html );
+
+		assert.deepEqual( actual, expected, 'Result of parse does not match!' );
       });
   	});
 

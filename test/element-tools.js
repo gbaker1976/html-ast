@@ -1,20 +1,19 @@
-import 'babel-polyfill';
-const elementTools = require( '../element-tools' );
-const constants = require( '../html-consts' );
+import {elementTools} from '../element-tools';
+import {CONSTS} from '../html-consts';
 
-let assert = require( 'assert' );
+import assert from 'assert';
 
 describe( 'Element Tools', () => {
 	describe( '#createNodeOfType', () => {
 		it( 'should create node of type element', ( done ) => {
-			let expected = {
+			const expected = {
 				type: 1,
 				name: '',
 				value: '',
 				parameters: [],
 				children: []
 			};
-			let actual = elementTools.createNodeOfType( constants.NODETYPE_ELEMENT );
+			const actual = elementTools.createNodeOfType( CONSTS.NODETYPE_ELEMENT );
 
 			assert.deepEqual( actual, expected, 'Result of parse does not match!' );
 			done();

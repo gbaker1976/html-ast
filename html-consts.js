@@ -1,4 +1,4 @@
-module.exports =  {
+export const CONSTS = {
 	CONTEXT_OPEN_TAG:  1,
 	CONTEXT_CLOSE_TAG:  2,
 	CONTEXT_OPEN_ELEMENT:  4,

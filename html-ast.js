@@ -3,8 +3,8 @@
  * v1.0
  * author: Garrett Baker
  */
-const constants = require( './html-consts' );
-const elementTools = require( './element-tools' );
+import {CONSTS} from './html-consts';
+import {elementTools} from './element-tools';
 
 const tokens = {
 	'<': elementTools.leftAngleDelimiter,
@@ -16,7 +16,7 @@ const tokens = {
 	'!': elementTools.bangDelimiter,
 	'-': elementTools.hyphenDelimiter
 };
-const parser = ( str ) => {
+export const parser = ( str ) => {
 	let buf = [];
 	let context = null;
 	let ast = {
@@ -47,70 +47,70 @@ const parser = ( str ) => {
 				context = tokens[chr]( str, idx, ast, buf, context );
 			}
 
-			if ( context & ( constants.CONTEXT_CLOSE_COMMENT |
-							 constants.CONTEXT_CLOSE_DECL |
-							 constants.CONTEXT_CLOSE_TAG |
-							 constants.CONTEXT_CLOSE_TAG_NAME |
-							 constants.CONTEXT_CLOSE_PARAM_NAME |
-							 constants.CONTEXT_CLOSE_PARAM_VALUE |
-							 constants.CONTEXT_CLOSE_OPEN_TAG |
-							 constants.CONTEXT_CLOSE_ELEMENT |
-							 constants.CONTEXT_OPEN_ELEMENT |
-							 constants.CONTEXT_CLOSE_TEXT ) ) {
+			if ( context & ( CONSTS.CONTEXT_CLOSE_COMMENT |
+							 CONSTS.CONTEXT_CLOSE_DECL |
+							 CONSTS.CONTEXT_CLOSE_TAG |
+							 CONSTS.CONTEXT_CLOSE_TAG_NAME |
+							 CONSTS.CONTEXT_CLOSE_PARAM_NAME |
+							 CONSTS.CONTEXT_CLOSE_PARAM_VALUE |
+							 CONSTS.CONTEXT_CLOSE_OPEN_TAG |
+							 CONSTS.CONTEXT_CLOSE_ELEMENT |
+							 CONSTS.CONTEXT_OPEN_ELEMENT |
+							 CONSTS.CONTEXT_CLOSE_TEXT ) ) {
 				buf = [];
 
-				if ( context & ( constants.CONTEXT_CLOSE_ELEMENT |
-				 				 constants.CONTEXT_CLOSE_TEXT |
-						 		 constants.CONTEXT_CLOSE_DECL ) ) {
+				if ( context & ( CONSTS.CONTEXT_CLOSE_ELEMENT |
+				 				 CONSTS.CONTEXT_CLOSE_TEXT |
+						 		 CONSTS.CONTEXT_CLOSE_DECL ) ) {
 					elementTools.unwireParent( ast );
 				}
 			}
 		} else {
-			if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
+			if ( context & CONSTS.CONTEXT_CLOSE_PARAM_NAME ) {
 				throw new Error( 'Undelimited parameter value or missing parameter value on line: ' + ast.lineCount );
 			}
 
-			if ( context & ( constants.CONTEXT_OPEN_TEXT |
-							 constants.CONTEXT_OPEN_COMMENT |
-							 constants.CONTEXT_OPEN_PARAM_VALUE |
-							 constants.CONTEXT_CLOSE_PARAM_VALUE |
-							 constants.CONTEXT_OPEN_PARAM_NAME |
-							 constants.CONTEXT_OPEN_DECL_NAME |
-							 constants.CONTEXT_OPEN_ELEMENT |
-							 constants.CONTEXT_OPEN_TAG_NAME |
-						  	 constants.CONTEXT_CLOSE_TAG_NAME ) ) {
+			if ( context & ( CONSTS.CONTEXT_OPEN_TEXT |
+							 CONSTS.CONTEXT_OPEN_COMMENT |
+							 CONSTS.CONTEXT_OPEN_PARAM_VALUE |
+							 CONSTS.CONTEXT_CLOSE_PARAM_VALUE |
+							 CONSTS.CONTEXT_OPEN_PARAM_NAME |
+							 CONSTS.CONTEXT_OPEN_DECL_NAME |
+							 CONSTS.CONTEXT_OPEN_ELEMENT |
+							 CONSTS.CONTEXT_OPEN_TAG_NAME |
+						  	 CONSTS.CONTEXT_CLOSE_TAG_NAME ) ) {
 
 				buf.push(chr);
 
-				if ( context & constants.CONTEXT_CLOSE_PARAM_VALUE ) {
-					context = constants.CONTEXT_OPEN_PARAM_NAME;
+				if ( context & CONSTS.CONTEXT_CLOSE_PARAM_VALUE ) {
+					context = CONSTS.CONTEXT_OPEN_PARAM_NAME;
 				}
 
-				if ( context & constants.CONTEXT_CLOSE_TAG_NAME ) {
-					context = constants.CONTEXT_OPEN_PARAM_NAME;
+				if ( context & CONSTS.CONTEXT_CLOSE_TAG_NAME ) {
+					context = CONSTS.CONTEXT_OPEN_PARAM_NAME;
 				}
 
-				if ( context & constants.CONTEXT_OPEN_ELEMENT ){
-					context = constants.CONTEXT_OPEN_TAG_NAME;
+				if ( context & CONSTS.CONTEXT_OPEN_ELEMENT ){
+					context = CONSTS.CONTEXT_OPEN_TAG_NAME;
 				}
 
-			} else if ( context & ( constants.CONTEXT_OPEN_DECL ) ) {
+			} else if ( context & ( CONSTS.CONTEXT_OPEN_DECL ) ) {
 				if ( !ast.current.name ) {
-					context = constants.CONTEXT_OPEN_DECL_NAME;
+					context = CONSTS.CONTEXT_OPEN_DECL_NAME;
 					buf.push(chr);
 				} else {
 					ast.current.value += chr;
 				}
-			} else if ( context & ( constants.CONTEXT_CLOSE_OPEN_TAG |
-									constants.CONTEXT_CLOSE_ELEMENT ) ) {
+			} else if ( context & ( CONSTS.CONTEXT_CLOSE_OPEN_TAG |
+									CONSTS.CONTEXT_CLOSE_ELEMENT ) ) {
 
-				var isScript = context & constants.CONTEXT_SCRIPT_TAG;
-				context = constants.CONTEXT_OPEN_TEXT;
+				var isScript = context & CONSTS.CONTEXT_SCRIPT_TAG;
+				context = CONSTS.CONTEXT_OPEN_TEXT;
 				if (isScript){
-					context |= constants.CONTEXT_SCRIPT_TAG;
+					context |= CONSTS.CONTEXT_SCRIPT_TAG;
 				}
 
-				elementTools.addChildNode( ast, constants.NODETYPE_TEXT );
+				elementTools.addChildNode( ast, CONSTS.NODETYPE_TEXT );
 				buf.push(chr);
 			}
 		}
@@ -123,4 +123,4 @@ const parser = ( str ) => {
 	return ast;
 };
 
-module.exports = parser;
+export default parser;

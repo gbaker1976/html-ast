@@ -1,4 +1,4 @@
-const constants = require( './html-consts' );
+const {CONSTS} = require( './html-consts' );
 
 const createNodeOfType = (type) => {
 	return {
@@ -18,7 +18,7 @@ const addChildNode = (ast, type) => {
 	if ( ast.current === ast ) {
 		arr = ast.current.doc;
 	} else {
-		if ( ast.current.type & ( constants.NODETYPE_ELEMENT | constants.NODETYPE_DECL ) &&
+		if ( ast.current.type & ( CONSTS.NODETYPE_ELEMENT | CONSTS.NODETYPE_DECL ) &&
 			 ast.parents.indexOf(ast.current) === -1 ) {
 
 			ast.parents.push(ast.current);
@@ -58,7 +58,7 @@ const countLine = (chr, ast) => {
 	}
 };
 
-module.exports = {
+export const elementTools = {
 	createNodeOfType: createNodeOfType,
 	addChildNode: addChildNode,
 	addParameter: addParameter,
@@ -73,13 +73,13 @@ module.exports = {
 	},
 
 	quoteDelimiter: (str, idx, ast, buf, context) => {
-		if ( context & ( constants.CONTEXT_OPEN_COMMENT | constants.CONTEXT_OPEN_TEXT ) ) {
+		if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT | CONSTS.CONTEXT_OPEN_TEXT ) ) {
 			buf.push(str[idx]);
-		} else if ( context & ( constants.CONTEXT_OPEN_TAG | constants.CONTEXT_CLOSE_PARAM_NAME ) ) {
-			return constants.CONTEXT_OPEN_PARAM_VALUE;
-		} else if ( context & constants.CONTEXT_OPEN_PARAM_VALUE ) {
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_TAG | CONSTS.CONTEXT_CLOSE_PARAM_NAME ) ) {
+			return CONSTS.CONTEXT_OPEN_PARAM_VALUE;
+		} else if ( context & CONSTS.CONTEXT_OPEN_PARAM_VALUE ) {
 			ast.current.parameters[ast.current.parameters.length-1].value = buf.join('').replace(/\s+/, ' ');
-			return constants.CONTEXT_CLOSE_PARAM_VALUE;
+			return CONSTS.CONTEXT_CLOSE_PARAM_VALUE;
 		}
 
 		return context;
@@ -90,46 +90,46 @@ module.exports = {
 
 		countLine(chr, ast);
 
-		if ( context & constants.CONTEXT_CLOSE_PARAM_NAME ) {
+		if ( context & CONSTS.CONTEXT_CLOSE_PARAM_NAME ) {
 			throw new Error( 'Undelimited parameter value or missing parameter value on line: ' + ast.lineCount );
 		}
 
-		if ( context & ( constants.CONTEXT_OPEN_COMMENT |
-						 constants.CONTEXT_OPEN_TEXT |
-						 constants.CONTEXT_OPEN_PARAM_VALUE ) ) {
+		if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
+						 CONSTS.CONTEXT_OPEN_TEXT |
+						 CONSTS.CONTEXT_OPEN_PARAM_VALUE ) ) {
 			buf.push(chr);
-		} else if ( context & ( constants.CONTEXT_CLOSE_COMMENT |
-								constants.CONTEXT_OPEN_DECL_NAME |
-								constants.CONTEXT_OPEN_TAG_NAME ) ) {
+		} else if ( context & ( CONSTS.CONTEXT_CLOSE_COMMENT |
+								CONSTS.CONTEXT_OPEN_DECL_NAME |
+								CONSTS.CONTEXT_OPEN_TAG_NAME ) ) {
 
-			if ( context & constants.CONTEXT_OPEN_DECL_NAME |
-						   constants.CONTEXT_OPEN_TAG_NAME ) {
+			if ( context & CONSTS.CONTEXT_OPEN_DECL_NAME |
+						   CONSTS.CONTEXT_OPEN_TAG_NAME ) {
 				ast.current.name = buf.join('');
 			}
 
-			if ( context & constants.CONTEXT_OPEN_TAG_NAME ) {
-				context = constants.CONTEXT_CLOSE_TAG_NAME;
+			if ( context & CONSTS.CONTEXT_OPEN_TAG_NAME ) {
+				context = CONSTS.CONTEXT_CLOSE_TAG_NAME;
 
 				if ( 'script' === ast.current.name ) {
-					context |= constants.CONTEXT_SCRIPT_TAG;
+					context |= CONSTS.CONTEXT_SCRIPT_TAG;
 				}
 
 				return context;
 			}
 
-			return constants.CONTEXT_OPEN_DECL;
+			return CONSTS.CONTEXT_OPEN_DECL;
 		}
 
 		return context;
 	},
 
 	bangDelimiter: (str, idx, ast, buf, context) => {
-		if ( context & constants.CONTEXT_OPEN_ELEMENT ) {
-			ast.current.type = constants.NODETYPE_DECL;
-			return constants.CONTEXT_OPEN_DECL;
-		} else if ( context & ( constants.CONTEXT_OPEN_COMMENT |
-								constants.CONTEXT_OPEN_PARAM_VALUE |
-								constants.CONTEXT_OPEN_TEXT ) ) {
+		if ( context & CONSTS.CONTEXT_OPEN_ELEMENT ) {
+			ast.current.type = CONSTS.NODETYPE_DECL;
+			return CONSTS.CONTEXT_OPEN_DECL;
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
+								CONSTS.CONTEXT_OPEN_PARAM_VALUE |
+								CONSTS.CONTEXT_OPEN_TEXT ) ) {
 			buf.push(str[idx]);
 		}
 
@@ -137,24 +137,26 @@ module.exports = {
 	},
 
 	hyphenDelimiter: (str, idx, ast, buf, context) => {
-		if ( context & constants.CONTEXT_OPEN_PARAM_NAME ) {
+		if ( context & CONSTS.CONTEXT_OPEN_PARAM_NAME ) {
 			buf.push(str[idx]);
-		} else if ( context & ( constants.CONTEXT_OPEN_DECL | constants.CONTEXT_CLOSE_COMMENT ) ) {
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_DECL | CONSTS.CONTEXT_CLOSE_COMMENT ) ) {
+			// lookbehind, two hyphens within the open decl context is a comment
 			if ( '-' == str[idx-1] ) {
-				addChildNode( ast, constants.NODETYPE_COMMENT );
-				return constants.CONTEXT_OPEN_COMMENT;
+				addChildNode( ast, CONSTS.NODETYPE_COMMENT );
+				return CONSTS.CONTEXT_OPEN_COMMENT;
 			}
-		} else if ( context & constants.CONTEXT_OPEN_COMMENT ) {
+		} else if ( context & CONSTS.CONTEXT_OPEN_COMMENT ) {
+			// lookbehind, two hyphens within the open comment context is a closing comment
 			if ( '-' == str[idx-1] ) {
 				ast.current.value = buf.join('');
-				return constants.CONTEXT_CLOSE_COMMENT;
-			} else if ( context & ( constants.CONTEXT_OPEN_PARAM_NAME |
-									constants.CONTEXT_OPEN_PARAM_VALUE |
-									constants.CONTEXT_OPEN_TEXT |
-									constants.CONTEXT_OPEN_ELEMENT ) ) {
+				return CONSTS.CONTEXT_CLOSE_COMMENT;
+			} else if ( context & ( CONSTS.CONTEXT_OPEN_PARAM_NAME |
+									CONSTS.CONTEXT_OPEN_PARAM_VALUE |
+									CONSTS.CONTEXT_OPEN_TEXT |
+									CONSTS.CONTEXT_OPEN_ELEMENT ) ) {
 				buf.push(str[idx]);
-				if ( context & constants.CONTEXT_OPEN_ELEMENT ) {
-					return constants.CONTEXT_OPEN_PARAM_NAME;
+				if ( context & CONSTS.CONTEXT_OPEN_ELEMENT ) {
+					return CONSTS.CONTEXT_OPEN_PARAM_NAME;
 				}
 			}
 		}
@@ -165,14 +167,14 @@ module.exports = {
 	equalDelimiter: (str, idx, ast, buf, context) => {
 		const paramName = buf.join('');
 
-		if ( context & constants.CONTEXT_OPEN_PARAM_NAME ) {
+		if ( context & CONSTS.CONTEXT_OPEN_PARAM_NAME ) {
 			addParameter( ast, paramName );
-			return constants.CONTEXT_CLOSE_PARAM_NAME;
+			return CONSTS.CONTEXT_CLOSE_PARAM_NAME;
 		}
 
-		if ( context & ( constants.CONTEXT_OPEN_COMMENT |
-						 constants.CONTEXT_OPEN_PARAM_VALUE |
-						 constants.CONTEXT_OPEN_TEXT ) ) {
+		if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
+						 CONSTS.CONTEXT_OPEN_PARAM_VALUE |
+						 CONSTS.CONTEXT_OPEN_TEXT ) ) {
 			buf.push(str[idx]);
 		}
 
@@ -180,20 +182,20 @@ module.exports = {
 	},
 
 	slashDelimiter: (str, idx, ast, buf, context) => {
-		if ( context & ( constants.CONTEXT_OPEN_COMMENT |
-						 constants.CONTEXT_OPEN_PARAM_VALUE |
-						 constants.CONTEXT_OPEN_TEXT ) ) {
+		if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
+						 CONSTS.CONTEXT_OPEN_PARAM_VALUE |
+						 CONSTS.CONTEXT_OPEN_TEXT ) ) {
 			buf.push(str[idx]);
-		} else if ( context & ( constants.CONTEXT_OPEN_TAG_NAME |
-								constants.CONTEXT_CLOSE_PARAM_VALUE |
-								constants.CONTEXT_CLOSE_PARAM_NAME ) ) {
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_TAG_NAME |
+								CONSTS.CONTEXT_CLOSE_PARAM_VALUE |
+								CONSTS.CONTEXT_CLOSE_PARAM_NAME ) ) {
 
-			return constants.CONTEXT_CLOSE_ELEMENT;
-		} else if ( context & ( constants.CONTEXT_OPEN_TAG ) ) {
+			return CONSTS.CONTEXT_CLOSE_ELEMENT;
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_TAG ) ) {
 
-			context &= ~constants.CONTEXT_SCRIPT_TAG;
+			context &= ~CONSTS.CONTEXT_SCRIPT_TAG;
 
-			return constants.CONTEXT_CLOSE_TAG;
+			return CONSTS.CONTEXT_CLOSE_TAG;
 		}
 
 		return context;
@@ -201,89 +203,98 @@ module.exports = {
 
 	rightAngleDelimiter: (str, idx, ast, buf, context) => {
 
-		if ( context & constants.CONTEXT_OPEN_PARAM_VALUE ) {
+		if ( context & CONSTS.CONTEXT_OPEN_PARAM_VALUE ) {
+			// todo: add auto-closing param value + tests
 			throw new Error( 'Missing closing parameter value delimiter on line: ' + ast.lineCount );
 		}
 
-		if ( context & ( constants.CONTEXT_OPEN_DECL |
-						 constants.CONTEXT_OPEN_DECL_NAME |
-						 constants.CONTEXT_OPEN_TAG_NAME ) ) {
+		if ( context & ( CONSTS.CONTEXT_OPEN_DECL |
+						 CONSTS.CONTEXT_OPEN_DECL_NAME |
+						 CONSTS.CONTEXT_OPEN_TAG_NAME ) ) {
 
 			ast.current.name = buf.join('');
 
-			if ( context & constants.CONTEXT_OPEN_TAG_NAME ) {
-				context = constants.CONTEXT_CLOSE_OPEN_TAG;
+			if ( context & CONSTS.CONTEXT_OPEN_TAG_NAME ) {
+				context = CONSTS.CONTEXT_CLOSE_OPEN_TAG;
 
 				if ( 'script' === ast.current.name ) {
-					context |= constants.CONTEXT_SCRIPT_TAG;
+					context |= CONSTS.CONTEXT_SCRIPT_TAG;
+				}
+
+				if ( 'meta' === ast.current.name || 'img' === ast.current.name ) {
+					context = CONSTS.CONTEXT_CLOSE_ELEMENT;
 				}
 
 				return context;
 			}
 
-			if ( context & ( constants.CONTEXT_OPEN_DECL |
-							 constants.CONTEXT_OPEN_DECL_NAME ) ) {
-				return constants.CONTEXT_CLOSE_DECL;
+			if ( context & ( CONSTS.CONTEXT_OPEN_DECL |
+							 CONSTS.CONTEXT_OPEN_DECL_NAME ) ) {
+				return CONSTS.CONTEXT_CLOSE_DECL;
 			}
-		} else if ( context & ( constants.CONTEXT_OPEN_COMMENT |
-								constants.CONTEXT_OPEN_PARAM_VALUE |
-								constants.CONTEXT_CLOSE_TEXT ) ) {
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
+								CONSTS.CONTEXT_OPEN_PARAM_VALUE |
+								CONSTS.CONTEXT_CLOSE_TEXT ) ) {
 			buf.push(str[idx]);
-		} else if ( context & ( constants.CONTEXT_OPEN_TAG |
-								constants.CONTEXT_CLOSE_PARAM_VALUE |
-								constants.CONTEXT_OPEN_PARAM_NAME ) ) {
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_TAG |
+								CONSTS.CONTEXT_CLOSE_PARAM_VALUE |
+								CONSTS.CONTEXT_OPEN_PARAM_NAME ) ) {
 
-			context = constants.CONTEXT_CLOSE_OPEN_TAG;
+			context = CONSTS.CONTEXT_CLOSE_OPEN_TAG;
 
 			if ( 'script' === ast.current.name ) {
-				context |= constants.CONTEXT_SCRIPT_TAG;
+				context |= CONSTS.CONTEXT_SCRIPT_TAG;
+			}
+
+			if ( 'meta' === ast.current.name || 'img' === ast.current.name ) {
+				context |= CONSTS.CONTEXT_CLOSE_ELEMENT;
 			}
 
 			return context;
-		} else if ( context & constants.CONTEXT_CLOSE_TAG ) {
-			return constants.CONTEXT_CLOSE_ELEMENT;
-		} else if ( context & constants.CONTEXT_CLOSE_COMMENT ) {
-			return constants.CONTEXT_CLOSE_DECL;
+		} else if ( context & CONSTS.CONTEXT_CLOSE_TAG ) {
+			return CONSTS.CONTEXT_CLOSE_ELEMENT;
+		} else if ( context & CONSTS.CONTEXT_CLOSE_COMMENT ) {
+			return CONSTS.CONTEXT_CLOSE_DECL;
 		}
 
 		return context;
 	},
 
 	leftAngleDelimiter: (str, idx, ast, buf, context) => {
-		const endTag = ( '/' === str[idx+1] && (context & ~constants.CONTEXT_SCRIPT_TAG) );
-		const openDecl = ( '!' === str[idx+1] && (context & ~constants.CONTEXT_SCRIPT_TAG) );
+		const endTag = ( '/' === str[idx+1] && (context & ~CONSTS.CONTEXT_SCRIPT_TAG) );
+		const openDecl = ( '!' === str[idx+1] && (context & ~CONSTS.CONTEXT_SCRIPT_TAG) );
 
-		if ( null === context || (context & (constants.CONTEXT_CLOSE_OPEN_TAG |
-											 constants.CONTEXT_CLOSE_DECL |
-											 constants.CONTEXT_CLOSE_ELEMENT |
-											 constants.CONTEXT_CLOSE_TEXT)) ) {
+		if ( null === context || (context & (CONSTS.CONTEXT_CLOSE_OPEN_TAG |
+											 CONSTS.CONTEXT_CLOSE_DECL |
+											 CONSTS.CONTEXT_CLOSE_ELEMENT |
+											 CONSTS.CONTEXT_CLOSE_TEXT)) ) {
 			if ( !endTag ) {
-				addChildNode( ast, constants.NODETYPE_ELEMENT );
+				addChildNode( ast, CONSTS.NODETYPE_ELEMENT );
 			} else {
-				return constants.CONTEXT_OPEN_TAG;
+				return CONSTS.CONTEXT_OPEN_TAG;
 			}
-		} else if ( context & ( constants.CONTEXT_OPEN_COMMENT |
-								constants.CONTEXT_OPEN_PARAM_VALUE ) ) {
+		} else if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
+								CONSTS.CONTEXT_OPEN_PARAM_VALUE ) ) {
 			buf.push(str[idx]);
-		} else if ( context & constants.CONTEXT_OPEN_TEXT ) {
+		} else if ( context & CONSTS.CONTEXT_OPEN_TEXT ) {
 			if ( endTag ) {
 				ast.current.value = buf.join('');
-				return constants.CONTEXT_OPEN_TAG;
+				return CONSTS.CONTEXT_OPEN_TAG;
 			} else if ( openDecl ) {
 				ast.current.value = buf.join('');
-				addChildNode( ast, constants.NODETYPE_DECL );
-				return constants.CONTEXT_OPEN_ELEMENT;
-			} else if ( context & constants.CONTEXT_SCRIPT_TAG ) {
+				addChildNode( ast, CONSTS.NODETYPE_DECL );
+				return CONSTS.CONTEXT_OPEN_ELEMENT;
+			} else if ( context & CONSTS.CONTEXT_SCRIPT_TAG ) {
 				buf.push(str[idx]);
 			} else {
 				ast.current.value = buf.join('');
-				addChildNode( ast, constants.NODETYPE_ELEMENT );
-				return constants.CONTEXT_OPEN_ELEMENT;
+				addChildNode( ast, CONSTS.NODETYPE_ELEMENT );
+				return CONSTS.CONTEXT_OPEN_ELEMENT;
 			}
 
 			return context;
 		}
 
-		return constants.CONTEXT_OPEN_ELEMENT;
+		return CONSTS.CONTEXT_OPEN_ELEMENT;
 	}
 };
