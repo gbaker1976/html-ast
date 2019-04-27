@@ -37,6 +37,7 @@ export const parser = ( str ) => {
 		return ast;
 	}
 
+	// todo: handle end of string with incomplete markup
 	for ( idx = 0; idx < str.length; idx++ ) {
 		chr = str[idx];
 
@@ -110,7 +111,7 @@ export const parser = ( str ) => {
 					context |= CONSTS.CONTEXT_SCRIPT_TAG;
 				}
 
-				elementTools.addChildNode( ast, CONSTS.NODETYPE_TEXT );
+				elementTools.addChildNode( ast, elementTools.createNodeOfType(CONSTS.NODETYPE_TEXT) );
 				buf.push(chr);
 			}
 		}

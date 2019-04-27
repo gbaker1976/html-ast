@@ -1,8 +1,8 @@
 const {CONSTS} = require( './html-consts' );
 
-const createNodeOfType = (type) => {
+export const createNodeOfType = (type=CONSTS.NODETYPE_ELEMENT) => {
 	return {
-		type: type || '',
+		type: type,
 		name: '',
 		value: '',
 		parameters: [],
@@ -10,9 +10,11 @@ const createNodeOfType = (type) => {
 	};
 };
 
-const addChildNode = (ast, type) => {
+export const addChildNode = (ast, node) => {
 	let len = 0;
 	let arr;
+
+	if (!node) throw new Error('You must provide a child node to add!');
 
 	// if ast.current == ast then there are no child nodes yet
 	if ( ast.current === ast ) {
@@ -27,7 +29,7 @@ const addChildNode = (ast, type) => {
 		arr = ast.parents[ast.parents.length-1].children;
 	}
 
-	len = arr.push(createNodeOfType( type || '' ));
+	len = arr.push(node);
 
 	ast.current = arr[len-1];
 };
@@ -142,7 +144,7 @@ export const elementTools = {
 		} else if ( context & ( CONSTS.CONTEXT_OPEN_DECL | CONSTS.CONTEXT_CLOSE_COMMENT ) ) {
 			// lookbehind, two hyphens within the open decl context is a comment
 			if ( '-' == str[idx-1] ) {
-				addChildNode( ast, CONSTS.NODETYPE_COMMENT );
+				addChildNode( ast, createNodeOfType(CONSTS.NODETYPE_COMMENT) );
 				return CONSTS.CONTEXT_OPEN_COMMENT;
 			}
 		} else if ( context & CONSTS.CONTEXT_OPEN_COMMENT ) {
@@ -262,33 +264,34 @@ export const elementTools = {
 
 	leftAngleDelimiter: (str, idx, ast, buf, context) => {
 		const endTag = ( '/' === str[idx+1] && (context & ~CONSTS.CONTEXT_SCRIPT_TAG) );
-		const openDecl = ( '!' === str[idx+1] && (context & ~CONSTS.CONTEXT_SCRIPT_TAG) );
+		const openDecl = ( '!' === str[idx+1] && (context & (~CONSTS.CONTEXT_SCRIPT_TAG | ~CONSTS.CONTEXT_OPEN_COMMENT)) );
 
 		if ( null === context || (context & (CONSTS.CONTEXT_CLOSE_OPEN_TAG |
 											 CONSTS.CONTEXT_CLOSE_DECL |
 											 CONSTS.CONTEXT_CLOSE_ELEMENT |
 											 CONSTS.CONTEXT_CLOSE_TEXT)) ) {
 			if ( !endTag ) {
-				addChildNode( ast, CONSTS.NODETYPE_ELEMENT );
+				addChildNode( ast, createNodeOfType(CONSTS.NODETYPE_ELEMENT) );
 			} else {
 				return CONSTS.CONTEXT_OPEN_TAG;
 			}
 		} else if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
 								CONSTS.CONTEXT_OPEN_PARAM_VALUE ) ) {
 			buf.push(str[idx]);
+			return context;
 		} else if ( context & CONSTS.CONTEXT_OPEN_TEXT ) {
 			if ( endTag ) {
 				ast.current.value = buf.join('');
 				return CONSTS.CONTEXT_OPEN_TAG;
 			} else if ( openDecl ) {
 				ast.current.value = buf.join('');
-				addChildNode( ast, CONSTS.NODETYPE_DECL );
+				addChildNode( ast, createNodeOfType(CONSTS.NODETYPE_DECL) );
 				return CONSTS.CONTEXT_OPEN_ELEMENT;
 			} else if ( context & CONSTS.CONTEXT_SCRIPT_TAG ) {
 				buf.push(str[idx]);
 			} else {
 				ast.current.value = buf.join('');
-				addChildNode( ast, CONSTS.NODETYPE_ELEMENT );
+				addChildNode( ast, createNodeOfType(CONSTS.NODETYPE_ELEMENT) );
 				return CONSTS.CONTEXT_OPEN_ELEMENT;
 			}
 
