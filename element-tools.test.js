@@ -110,5 +110,109 @@ describe( 'Element Tools', () => {
 				'Current node parent does not equal ast!'
 			);
       	});
+
+		it( 'should create element (head) node as child of element (html) node', () => {
+			const ast = {
+				current: null,
+				lineCount: 0,
+				doc: []
+			};
+			const declarationNode = elementTools.createNodeOfType(CONSTS.NODETYPE_DECL);
+			const elementNode = elementTools.createNodeOfType(CONSTS.NODETYPE_ELEMENT);
+			const headNode = elementTools.createNodeOfType(CONSTS.NODETYPE_ELEMENT);
+
+			ast.current = ast;
+
+			elementTools.addChildNode(ast, declarationNode);
+			declarationNode.name = 'doctype';
+
+			elementTools.addChildNode(ast, elementNode);
+			elementNode.name = 'html';
+
+			elementTools.addChildNode(ast, headNode);
+			headNode.name = 'head';
+
+			assert.deepEqual(
+				ast.current,
+				headNode,
+				'Current ast node is not the newly created element (head) node!'
+			)
+			assert.deepEqual(
+				ast.current.parent.children,
+				[headNode],
+				'Current ast node parent child array does not contain element (head) node!'
+			);
+			assert.deepEqual(
+				ast.current.parent,
+				elementNode,
+				'Current ast node parent does not equal element (html) node!'
+			);
+      	});
+
+		it( 'should create meta and title element nodes as children of element (head) node', () => {
+			const ast = {
+				current: null,
+				lineCount: 0,
+				doc: []
+			};
+			const declarationNode = elementTools.createNodeOfType(CONSTS.NODETYPE_DECL);
+			const elementNode = elementTools.createNodeOfType(CONSTS.NODETYPE_ELEMENT);
+			const headNode = elementTools.createNodeOfType(CONSTS.NODETYPE_ELEMENT);
+			const metaNode = elementTools.createNodeOfType(CONSTS.NODETYPE_ELEMENT);
+			const titleNode = elementTools.createNodeOfType(CONSTS.NODETYPE_ELEMENT);
+
+			ast.current = ast;
+
+			elementTools.addChildNode(ast, declarationNode);
+			declarationNode.name = 'doctype';
+
+			elementTools.addChildNode(ast, elementNode);
+			elementNode.name = 'html';
+
+			elementTools.addChildNode(ast, headNode);
+			headNode.name = 'head';
+
+			elementTools.addChildNode(ast, metaNode);
+			metaNode.name = 'meta';
+			metaNode.parameters.push({
+				name: 'charset',
+				value: 'utf-8'
+			});
+
+			assert.deepEqual(
+				ast.current,
+				metaNode,
+				'Current ast node is not the newly created element (meta) node!'
+			)
+			assert.deepEqual(
+				ast.current.parent.children,
+				[metaNode],
+				'Current ast node parent child array does not contain element (meta) node!'
+			);
+			assert.deepEqual(
+				ast.current.parent,
+				headNode,
+				'Current ast node parent does not equal element (head) node!'
+			);
+
+			elementTools.addChildNode(ast, titleNode);
+			metaNode.name = 'title';
+
+			assert.deepEqual(
+				ast.current,
+				titleNode,
+				'Current ast node is not the newly created element (title) node!'
+			)
+			assert.deepEqual(
+				ast.current.parent.children,
+				[metaNode, titleNode],
+				'Current ast node parent child array does not contain element (title, meta) nodes!'
+			);
+			assert.deepEqual(
+				ast.current.parent,
+				headNode,
+				'Current ast node parent does not equal element (head) node!'
+			);
+      	});
   	});
 });
