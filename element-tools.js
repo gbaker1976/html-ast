@@ -6,32 +6,45 @@ export const createNodeOfType = (type=CONSTS.NODETYPE_ELEMENT) => {
 		name: '',
 		value: '',
 		parameters: [],
-		children: []
+		children: [],
+		parent: null
 	};
 };
 
+const nodeCanHaveChildren = (node) => {
+	return node.type & ( CONSTS.NODETYPE_ELEMENT | CONSTS.NODETYPE_DECL ) &&
+		 !isEmptyElement(node);
+};
+
 export const addChildNode = (ast, node) => {
-	let len = 0;
-	let arr;
-
 	if (!node) throw new Error('You must provide a child node to add!');
-
 	// if ast.current == ast then there are no child nodes yet
+	// this will be the initial state of our ast
 	if ( ast.current === ast ) {
-		arr = ast.current.doc;
+		// push node into doc array
+		node.parent = ast;
+		ast.doc.push(node);
+	// current node may have child nodes
+	} else if (nodeCanHaveChildren(ast.current)) {
+		node.parent = ast.current;
+		// push node into child array of current node
+		ast.current.children.push(node);
+	// the current node is not top-level parent and cannot have child nodes
 	} else {
-		if ( ast.current.type & ( CONSTS.NODETYPE_ELEMENT | CONSTS.NODETYPE_DECL ) &&
-			 ast.parents.indexOf(ast.current) === -1 ) {
-
-			ast.parents.push(ast.current);
+		// handle top-level node with no parent node
+		if (ast.current.parent === ast) {
+			// at this point, we may have antecedent empty elements to current node
+			// we still have no parent element, fall back to the root doc
+			node.parent = ast;
+			ast.doc.push(node);
+		} else {
+			// push node into child array of parent
+			node.parent = ast.current.parent;
+			ast.current.parent.children.push(node);
 		}
-
-		arr = ast.parents[ast.parents.length-1].children;
 	}
 
-	len = arr.push(node);
-
-	ast.current = arr[len-1];
+	ast.current = node;
 };
 
 const addParameter = (ast, name, value) => {
@@ -60,18 +73,22 @@ const countLine = (chr, ast) => {
 	}
 };
 
-export const elementTools = {
-	createNodeOfType: createNodeOfType,
-	addChildNode: addChildNode,
-	addParameter: addParameter,
+const isEmptyElement = (currentNode) => {
+	return ['meta','img','doctype'].indexOf(currentNode.name) > -1;
+};
 
-	assignContext: (ast, value) => {
-		ast.current.context = value || '*' ;
-	},
+export const elementTools = {
+	createNodeOfType,
+	addChildNode,
+	addParameter,
+	isEmptyElement,
 
 	unwireParent: (ast) => {
-		ast.parents.pop();
-		ast.current = ast.parents.length ? ast.parents[ast.parents.length-1] : ast;
+		// when closing out elements, we need to unwire the current parent
+		// but, we do not unwire current parent for empty elements
+		if (!isEmptyElement(ast.current) && ast.current.parent !== ast) {
+			ast.current = ast.current.parent;
+		}
 	},
 
 	quoteDelimiter: (str, idx, ast, buf, context) => {
@@ -223,7 +240,7 @@ export const elementTools = {
 					context |= CONSTS.CONTEXT_SCRIPT_TAG;
 				}
 
-				if ( 'meta' === ast.current.name || 'img' === ast.current.name ) {
+				if ( isEmptyElement(ast.current) ) {
 					context = CONSTS.CONTEXT_CLOSE_ELEMENT;
 				}
 
@@ -248,8 +265,8 @@ export const elementTools = {
 				context |= CONSTS.CONTEXT_SCRIPT_TAG;
 			}
 
-			if ( 'meta' === ast.current.name || 'img' === ast.current.name ) {
-				context |= CONSTS.CONTEXT_CLOSE_ELEMENT;
+			if ( isEmptyElement(ast.current) ) {
+				context = CONSTS.CONTEXT_CLOSE_ELEMENT;
 			}
 
 			return context;
@@ -273,7 +290,7 @@ export const elementTools = {
 			if ( !endTag ) {
 				addChildNode( ast, createNodeOfType(CONSTS.NODETYPE_ELEMENT) );
 			} else {
-				return CONSTS.CONTEXT_OPEN_TAG;
+				return CONSTS.CONTEXT_CLOSE_TAG;
 			}
 		} else if ( context & ( CONSTS.CONTEXT_OPEN_COMMENT |
 								CONSTS.CONTEXT_OPEN_PARAM_VALUE ) ) {

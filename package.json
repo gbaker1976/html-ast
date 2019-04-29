@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "description": "A simple finite state machine-style AST HTML parser",
   "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --compilers js:@babel/register"
+    "test": "./node_modules/.bin/mocha --compilers js:@babel/register \"*.test.js\""
   },
   "repository": {
     "type": "git",

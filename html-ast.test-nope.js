@@ -1,35 +1,25 @@
-import {parser as htmlAst} from '../html-ast';
+import {parser as htmlAst} from './html-ast';
 import html5Json from './data/test_html5.json';
 import assert from 'assert';
 import fs from 'fs';
 
 const html5 = fs.readFileSync(__dirname + '/data/test_html5.html', {encoding: 'utf-8'});
 
-describe( 'HTML AST Parser', () => {
-	describe( '#html5 parse', () => {
-		// it( 'should parse HTML5 template into AST', () => {
-		// 	assert.deepEqual( htmlAst(html5), html5Json, 'Result of parse does not match!' );
-		// });
+describe ( 'HTML AST Parser', () => {
+	describe ( '#html5 parse', () => {
+		it( 'should parse HTML5 template into AST', () => {
+			assert.deepEqual( htmlAst(html5), html5Json, 'Result of parse does not match!' );
+		});
 
-		it ( 'should parse head corectly', () => {
+		it( 'should parse meta and title in head corectly', () => {
 			const head = `<!doctype html>
 			<html class="no-js" lang="">
-
 			<head>
 			  <meta charset="utf-8">
+			  <meta name="description" content="foo">
 			  <title></title>
-			  <meta name="description" content="">
-			  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-			  <link rel="manifest" href="site.webmanifest">
-			  <link rel="apple-touch-icon" href="icon.png">
-			  <!-- Place favicon.ico in the root directory -->
-
-			  <link rel="stylesheet" href="css/normalize.css">
-			  <link rel="stylesheet" href="css/main.css">
-
-			  <meta name="theme-color" content="#fafafa">
-			</head>`;
+			</head>
+			</html>`;
 			const expected = {
 				doc: [
 					{
@@ -78,91 +68,7 @@ describe( 'HTML AST Parser', () => {
 									"value": "description"
 								}, {
 									"name": "content",
-									"value": ""
-								}],
-								"children": []
-							}, {
-								"type": 1,
-								"name": "meta",
-								"value": "",
-								"parameters": [{
-									"name": "name",
-									"value": "viewport"
-								}, {
-									"name": "content",
-									"value": "width=devicewidth, initialscale=1"
-								}],
-								"children": []
-							}, {
-								"type": 1,
-								"name": "link",
-								"value": "",
-								"parameters": [{
-									"name": "rel",
-									"value": "appletouchicon"
-								}, {
-									"name": "href",
-									"value": "icon.png"
-								}],
-								"children": []
-							}, {
-								"type": 32,
-								"name": "",
-								"value": "",
-								"parameters": [],
-								"children": [{
-									"type": 2,
-									"name": "",
-									"value": " Place favicon.ico in the root directory ",
-									"parameters": [],
-									"children": []
-								}]
-							}, {
-								"type": 1,
-								"name": "link",
-								"value": "",
-								"parameters": [{
-									"name": "rel",
-									"value": "manifest"
-								}, {
-									"name": "href",
-									"value": "site.webmanifest"
-								}],
-								"children": []
-							}, {
-								"type": 1,
-								"name": "meta",
-								"value": "",
-								"parameters": [{
-									"name": "name",
-									"value": "themecolor"
-								}, {
-									"name": "content",
-									"value": "#fafafa"
-								}],
-								"children": []
-							}, {
-								"type": 1,
-								"name": "link",
-								"value": "",
-								"parameters": [{
-									"name": "rel",
-									"value": "stylesheet"
-								}, {
-									"name": "href",
-									"value": "css/main.css"
-								}],
-								"children": []
-							}, {
-								"type": 1,
-								"name": "link",
-								"value": "",
-								"parameters": [{
-									"name": "rel",
-									"value": "stylesheet"
-								}, {
-									"name": "href",
-									"value": "css/normalize.css"
+									"value": "foo"
 								}],
 								"children": []
 							}]
@@ -171,8 +77,171 @@ describe( 'HTML AST Parser', () => {
 				]
 			};
 
-			assert( expected, htmlAst(head), 'Parsed head ast does not match expected ast!');
+			assert.deepEqual( expected, htmlAst(head), 'Parsed head ast does not match expected ast!');
 		});
+
+		// it ( 'should parse meta, title, and links in head corectly', () => {
+		// 	const head = `<!doctype html>
+		// 	<html class="no-js" lang="">
+		// 	<head>
+		// 	  <meta charset="utf-8">
+		// 	  <title></title>
+		// 	  <meta name="description" content="">
+		// 	  <meta name="viewport" content="width=device-width, initial-scale=1">
+		//
+		// 	  <link rel="manifest" href="site.webmanifest">
+		// 	  <link rel="apple-touch-icon" href="icon.png">
+		// 	  <!-- Place favicon.ico in the root directory -->
+		//
+		// 	  <link rel="stylesheet" href="css/normalize.css">
+		// 	  <link rel="stylesheet" href="css/main.css">
+		//
+		// 	  <meta name="theme-color" content="#fafafa">
+		// 	</head>
+		// 	</html>`;
+		// 	const expected = {
+		// 		doc: [
+		// 			{
+		// 				"type": 32,
+		// 				"name": "doctype",
+		// 				"value": "html",
+		// 				"parameters": [],
+		// 				"children": []
+		// 			}, {
+		// 				"type": 1,
+		// 				"name": "html",
+		// 				"value": "",
+		// 				"parameters": [{
+		// 					"name": "class",
+		// 					"value": "nojs"
+		// 				}, {
+		// 					"name": "lang",
+		// 					"value": ""
+		// 				}],
+		// 				"children": [{
+		// 					"type": 1,
+		// 					"name": "head",
+		// 					"value": "",
+		// 					"parameters": [],
+		// 					"children": [{
+		// 						"type": 1,
+		// 						"name": "meta",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "charset",
+		// 							"value": "utf8"
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "title",
+		// 						"value": "",
+		// 						"parameters": [],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "meta",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "name",
+		// 							"value": "description"
+		// 						}, {
+		// 							"name": "content",
+		// 							"value": ""
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "meta",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "name",
+		// 							"value": "viewport"
+		// 						}, {
+		// 							"name": "content",
+		// 							"value": "width=devicewidth, initialscale=1"
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "link",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "rel",
+		// 							"value": "appletouchicon"
+		// 						}, {
+		// 							"name": "href",
+		// 							"value": "icon.png"
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 32,
+		// 						"name": "",
+		// 						"value": "",
+		// 						"parameters": [],
+		// 						"children": [{
+		// 							"type": 2,
+		// 							"name": "",
+		// 							"value": " Place favicon.ico in the root directory ",
+		// 							"parameters": [],
+		// 							"children": []
+		// 						}]
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "link",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "rel",
+		// 							"value": "manifest"
+		// 						}, {
+		// 							"name": "href",
+		// 							"value": "site.webmanifest"
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "meta",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "name",
+		// 							"value": "themecolor"
+		// 						}, {
+		// 							"name": "content",
+		// 							"value": "#fafafa"
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "link",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "rel",
+		// 							"value": "stylesheet"
+		// 						}, {
+		// 							"name": "href",
+		// 							"value": "css/main.css"
+		// 						}],
+		// 						"children": []
+		// 					}, {
+		// 						"type": 1,
+		// 						"name": "link",
+		// 						"value": "",
+		// 						"parameters": [{
+		// 							"name": "rel",
+		// 							"value": "stylesheet"
+		// 						}, {
+		// 							"name": "href",
+		// 							"value": "css/normalize.css"
+		// 						}],
+		// 						"children": []
+		// 					}]
+		// 				}]
+		// 			}
+		// 		]
+		// 	};
+		//
+		// 	assert.deepEqual( expected, htmlAst(head), 'Parsed head ast does not match expected ast!');
+		// });
 	});
 
 	describe( '#comments', () => {

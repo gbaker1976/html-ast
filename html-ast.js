@@ -19,10 +19,9 @@ const tokens = {
 export const parser = ( str ) => {
 	let buf = [];
 	let context = null;
-	let ast = {
-		lineCount: 1,
+	const ast = {
+		lineCount: 0,
 		current: null,
-		parents: [],
 		doc: []
 	};
 	let chr;
@@ -32,7 +31,6 @@ export const parser = ( str ) => {
 
 	if ( !str ) {
 		delete ast.current;
-		delete ast.parents;
 		delete ast.lineCount;
 		return ast;
 	}
@@ -63,7 +61,7 @@ export const parser = ( str ) => {
 				if ( context & ( CONSTS.CONTEXT_CLOSE_ELEMENT |
 				 				 CONSTS.CONTEXT_CLOSE_TEXT |
 						 		 CONSTS.CONTEXT_CLOSE_DECL ) ) {
-					elementTools.unwireParent( ast );
+					elementTools.unwireParent(ast);
 				}
 			}
 		} else {
@@ -118,7 +116,6 @@ export const parser = ( str ) => {
 	}
 
 	delete ast.current;
-	delete ast.parents;
 	delete ast.lineCount;
 
 	return ast;
